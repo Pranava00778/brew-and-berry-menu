@@ -12,6 +12,7 @@ import { GripVertical, Plus, Pencil, Trash2 } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export const Route = createFileRoute("/admin/categories")({
   component: CategoriesAdmin,
@@ -138,9 +139,8 @@ function CategoryDialog({ children, cat, onSaved }: { children: React.ReactNode;
         <div className="space-y-4">
           <div><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
           <div>
-            <Label>Image URL</Label>
-            <Input value={image} placeholder="https://…" onChange={(e) => setImage(e.target.value)} />
-            {image && <img src={image} alt="" className="mt-2 h-32 w-full rounded-lg object-cover" />}
+            <Label>Image</Label>
+            <div className="mt-1"><ImageUpload value={image} onChange={(u) => setImage(u ?? "")} folder="categories" aspect="video" /></div>
           </div>
           <Button onClick={save} className="w-full">Save</Button>
         </div>

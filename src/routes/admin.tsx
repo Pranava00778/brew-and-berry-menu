@@ -1,9 +1,11 @@
 import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Leaf, Home, Image as ImageIcon, Layers, Coffee, Settings as SettingsIcon, LogOut, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
+import { ensureMenuImagesBucket } from "@/lib/storage.functions";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -21,6 +23,10 @@ function AdminLayout() {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    if (isAdmin) ensureMenuImagesBucket().catch(() => {});
+  }, [isAdmin]);
 
   if (loading) {
     return <div className="min-h-screen grid place-items-center text-muted-foreground">Loading…</div>;

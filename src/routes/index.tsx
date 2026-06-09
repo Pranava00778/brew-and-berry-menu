@@ -82,15 +82,44 @@ function MenuPage() {
   }, [products]);
 
   const [activeCat, setActiveCat] = useState<string | null>(null);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const pillsRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (!activeCat && categories.length) setActiveCat(categories[0].id);
   }, [categories, activeCat]);
 
+  // Observe horizontal scroll to update active category
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root || categories.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) {
+          const id = (visible.target as HTMLElement).dataset.catId;
+          if (id) setActiveCat(id);
+        }
+      },
+      { root, threshold: [0.5, 0.75] }
+    );
+    Object.values(sectionRefs.current).forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, [categories]);
+
+  // Auto-scroll active pill into view
+  useEffect(() => {
+    if (!activeCat || !pillsRef.current) return;
+    const pill = pillsRef.current.querySelector<HTMLElement>(`[data-pill-id="${activeCat}"]`);
+    pill?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeCat]);
+
   const scrollToCategory = (id: string) => {
     setActiveCat(id);
-    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
   };
 
   const cover = landing?.cover_image || heroFallback;
@@ -137,110 +166,144 @@ function MenuPage() {
         </div>
       </section>
 
-      {/* Sticky category nav */}
+      {/* Sticky category nav with photos */}
       <div id="menu" className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border">
-        <div className="overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 px-4 py-3 min-w-max">
-            {categories.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => scrollToCategory(c.id)}
-                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                  activeCat === c.id
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-secondary text-secondary-foreground hover:bg-muted"
-                }`}
-              >
-                {c.category_name}
-              </button>
-            ))}
+        <div ref={pillsRef} className="overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-3 px-4 py-3 min-w-max">
+            {categories.map((c) => {
+              const active = activeCat === c.id;
+              return (
+                <button
+                  key={c.id}
+                  data-pill-id={c.id}
+                  onClick={() => scrollToCategory(c.id)}
+                  className={`flex flex-col items-center gap-1.5 shrink-0 transition-all ${
+                    active ? "scale-105" : "opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <div
+                    className={`h-14 w-14 rounded-full overflow-hidden border-2 transition-colors ${
+                      active ? "border-primary shadow-md" : "border-transparent"
+                    }`}
+                  >
+                    {c.category_image ? (
+                      <img src={c.category_image} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full bg-secondary grid place-items-center">
+                        <Leaf className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                  <span
+                    className={`whitespace-nowrap text-xs font-medium max-w-[88px] truncate ${
+                      active ? "text-primary" : "text-muted-foreground"
+                    }`}
+                  >
+                    {c.category_name}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Category sections */}
-      <main className="px-4 pb-32 pt-8 max-w-6xl mx-auto">
+      {/* Swipeable category sections */}
+      <main className="pb-32 pt-6">
         {categories.length === 0 && (
           <p className="text-center text-muted-foreground py-20">The menu is being prepared…</p>
         )}
-        {categories.map((cat) => {
-          const items = productsByCategory.get(cat.id) ?? [];
-          return (
-            <section
-              key={cat.id}
-              ref={(el: HTMLDivElement | null) => { sectionRefs.current[cat.id] = el; }}
-              className="scroll-mt-20 mb-16"
-            >
-              <div className="mb-6 flex items-end justify-between gap-4">
-                <div>
-                  <h2 className="font-display text-3xl md:text-4xl text-espresso">{cat.category_name}</h2>
-                  <div className="mt-2 h-px w-12 bg-primary" />
-                </div>
-                <span className="text-xs uppercase tracking-widest text-muted-foreground">
-                  {items.length} {items.length === 1 ? "item" : "items"}
-                </span>
-              </div>
-
-              {cat.category_image && (
-                <div className="mb-6 overflow-hidden rounded-2xl aspect-[21/9]">
-                  <img src={cat.category_image} alt={cat.category_name} className="h-full w-full object-cover" />
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {items.map((p) => (
-                  <article
-                    key={p.id}
-                    className="group rounded-2xl bg-card border border-border overflow-hidden shadow-sm hover:shadow-lg transition-all"
-                  >
-                    {p.product_image ? (
-                      <div className="aspect-[4/3] overflow-hidden bg-muted">
-                        <img
-                          src={p.product_image}
-                          alt={p.product_name}
-                          loading="lazy"
-                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-[4/3] bg-gradient-to-br from-bamboo-soft/30 to-sand flex items-center justify-center">
-                        <Leaf className="h-10 w-10 text-bamboo-soft/60" />
-                      </div>
-                    )}
-                    <div className="p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="font-display text-lg leading-tight text-espresso">{p.product_name}</h3>
-                        {Number(p.price) > 0 && (
-                          <span className="font-semibold text-primary tabular-nums">
-                            ₹{Number(p.price).toFixed(0)}
-                          </span>
-                        )}
-                      </div>
-                      {p.product_description && (
-                        <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                          {p.product_description}
-                        </p>
-                      )}
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                        {p.serving_size && (
-                          <span className="rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">
-                            {p.serving_size}
-                          </span>
-                        )}
-                        {p.allergen_warning && (
-                          <span className="rounded-full bg-accent/10 px-2.5 py-1 text-accent">
-                            ⚠ {p.allergen_warning}
-                          </span>
-                        )}
-                      </div>
+        <div
+          ref={scrollerRef}
+          className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth"
+          style={{ scrollSnapType: "x mandatory" }}
+        >
+          {categories.map((cat) => {
+            const items = productsByCategory.get(cat.id) ?? [];
+            return (
+              <section
+                key={cat.id}
+                data-cat-id={cat.id}
+                ref={(el: HTMLDivElement | null) => { sectionRefs.current[cat.id] = el; }}
+                className="snap-start shrink-0 w-full px-4 md:px-8"
+              >
+                <div className="max-w-6xl mx-auto">
+                  <div className="mb-6 flex items-end justify-between gap-4">
+                    <div>
+                      <h2 className="font-display text-3xl md:text-4xl text-espresso">{cat.category_name}</h2>
+                      <div className="mt-2 h-px w-12 bg-primary" />
                     </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          );
-        })}
+                    <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                      {items.length} {items.length === 1 ? "item" : "items"}
+                    </span>
+                  </div>
+
+                  {cat.category_image && (
+                    <div className="mb-6 overflow-hidden rounded-2xl aspect-[21/9]">
+                      <img src={cat.category_image} alt={cat.category_name} className="h-full w-full object-cover" />
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {items.map((p) => (
+                      <article
+                        key={p.id}
+                        className="group rounded-2xl bg-card border border-border overflow-hidden shadow-sm hover:shadow-lg transition-all"
+                      >
+                        {p.product_image ? (
+                          <div className="aspect-[4/3] overflow-hidden bg-muted">
+                            <img
+                              src={p.product_image}
+                              alt={p.product_name}
+                              loading="lazy"
+                              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                        ) : (
+                          <div className="aspect-[4/3] bg-gradient-to-br from-bamboo-soft/30 to-sand flex items-center justify-center">
+                            <Leaf className="h-10 w-10 text-bamboo-soft/60" />
+                          </div>
+                        )}
+                        <div className="p-5">
+                          <div className="flex items-start justify-between gap-3">
+                            <h3 className="font-display text-lg leading-tight text-espresso">{p.product_name}</h3>
+                            {Number(p.price) > 0 && (
+                              <span className="font-semibold text-primary tabular-nums">
+                                ₹{Number(p.price).toFixed(0)}
+                              </span>
+                            )}
+                          </div>
+                          {p.product_description && (
+                            <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                              {p.product_description}
+                            </p>
+                          )}
+                          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                            {p.serving_size && (
+                              <span className="rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">
+                                {p.serving_size}
+                              </span>
+                            )}
+                            {p.allergen_warning && (
+                              <span className="rounded-full bg-accent/10 px-2.5 py-1 text-accent">
+                                ⚠ {p.allergen_warning}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                    {items.length === 0 && (
+                      <p className="col-span-full text-center text-muted-foreground py-12 text-sm">No items in this category yet.</p>
+                    )}
+                  </div>
+                </div>
+              </section>
+            );
+          })}
+        </div>
       </main>
+
 
       <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
         <p className="font-display text-lg text-espresso">Brew & Berry</p>
