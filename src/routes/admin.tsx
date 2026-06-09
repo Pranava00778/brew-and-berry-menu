@@ -24,6 +24,10 @@ function AdminLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
+  useEffect(() => {
+    if (isAdmin) ensureMenuImagesBucket().catch(() => {});
+  }, [isAdmin]);
+
   if (loading) {
     return <div className="min-h-screen grid place-items-center text-muted-foreground">Loading…</div>;
   }
