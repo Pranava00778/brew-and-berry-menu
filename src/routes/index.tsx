@@ -168,7 +168,7 @@ function MenuPage() {
           return (
             <section
               key={cat.id}
-              ref={(el) => { sectionRefs.current[cat.id] = el; }}
+              ref={(el: HTMLDivElement | null) => { sectionRefs.current[cat.id] = el; }}
               className="scroll-mt-20 mb-16"
             >
               <div className="mb-6 flex items-end justify-between gap-4">
