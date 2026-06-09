@@ -238,9 +238,8 @@ function ProductDialog({
             <div><Label>Allergen warning</Label><Input value={form.allergen_warning} onChange={(e) => update("allergen_warning", e.target.value)} /></div>
           </div>
           <div>
-            <Label>Image URL</Label>
-            <Input value={form.product_image} placeholder="https://…" onChange={(e) => update("product_image", e.target.value)} />
-            {form.product_image && <img src={form.product_image} alt="" className="mt-2 h-32 w-full rounded-lg object-cover" />}
+            <Label>Image</Label>
+            <div className="mt-1"><ImageUpload value={form.product_image} onChange={(u) => update("product_image", u ?? "")} folder="products" aspect="video" /></div>
           </div>
           <Button onClick={save} className="w-full">Save</Button>
         </div>
