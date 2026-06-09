@@ -82,15 +82,44 @@ function MenuPage() {
   }, [products]);
 
   const [activeCat, setActiveCat] = useState<string | null>(null);
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const pillsRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (!activeCat && categories.length) setActiveCat(categories[0].id);
   }, [categories, activeCat]);
 
+  // Observe horizontal scroll to update active category
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root || categories.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) {
+          const id = (visible.target as HTMLElement).dataset.catId;
+          if (id) setActiveCat(id);
+        }
+      },
+      { root, threshold: [0.5, 0.75] }
+    );
+    Object.values(sectionRefs.current).forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, [categories]);
+
+  // Auto-scroll active pill into view
+  useEffect(() => {
+    if (!activeCat || !pillsRef.current) return;
+    const pill = pillsRef.current.querySelector<HTMLElement>(`[data-pill-id="${activeCat}"]`);
+    pill?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeCat]);
+
   const scrollToCategory = (id: string) => {
     setActiveCat(id);
-    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
   };
 
   const cover = landing?.cover_image || heroFallback;
