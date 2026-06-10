@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Leaf, Home, Image as ImageIcon, Layers, Coffee, Settings as SettingsIcon, LogOut, LayoutDashboard } from "lucide-react";
+import { Leaf, Home, Image as ImageIcon, Layers, Coffee, Settings as SettingsIcon, LogOut, LayoutDashboard, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 
@@ -16,6 +16,7 @@ const NAV = [
   { to: "/admin/landing", label: "Landing", icon: ImageIcon },
   { to: "/admin/categories", label: "Categories", icon: Layers },
   { to: "/admin/products", label: "Products", icon: Coffee },
+  { to: "/admin/footer", label: "Footer Links", icon: Link2 },
   { to: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ];
 
