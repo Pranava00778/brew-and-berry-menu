@@ -140,7 +140,7 @@ function CategoryDialog({ children, cat, onSaved }: { children: React.ReactNode;
           <div><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
           <div>
             <Label>Image</Label>
-            <div className="mt-1"><ImageUpload value={image} onChange={(u) => setImage(u ?? "")} folder="categories" aspect="video" /></div>
+            <div className="mt-1"><ImageUpload value={image} onChange={(u) => setImage(u ?? "")} bucket="categories" aspect="video" /></div>
           </div>
           <Button onClick={save} className="w-full">Save</Button>
         </div>
