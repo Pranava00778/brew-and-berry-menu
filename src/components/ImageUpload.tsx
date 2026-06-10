@@ -4,24 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Upload, Trash2, Loader2, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
-const BUCKET = "menu-images";
-
-function pathFromPublicUrl(url: string): string | null {
-  const marker = `/storage/v1/object/public/${BUCKET}/`;
+function pathFromPublicUrl(url: string, bucket: string): string | null {
+  const marker = `/storage/v1/object/public/${bucket}/`;
   const i = url.indexOf(marker);
   if (i === -1) return null;
   return url.slice(i + marker.length);
 }
 
+function bucketFromPublicUrl(url: string): string | null {
+  const m = url.match(/\/storage\/v1\/object\/public\/([^/]+)\//);
+  return m ? m[1] : null;
+}
+
 export function ImageUpload({
   value,
   onChange,
-  folder = "uploads",
+  bucket,
   aspect = "video",
 }: {
   value: string | null | undefined;
   onChange: (url: string | null) => void;
-  folder?: string;
+  bucket: "products" | "categories";
   aspect?: "video" | "square";
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,18 +34,19 @@ export function ImageUpload({
     setBusy(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";
-      const path = `${folder}/${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from(bucket).upload(path, file, {
         cacheControl: "3600",
         upsert: false,
         contentType: file.type,
       });
       if (error) throw error;
-      const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+      const { data } = supabase.storage.from(bucket).getPublicUrl(path);
       // delete previous if it was in our bucket
       if (value) {
-        const old = pathFromPublicUrl(value);
-        if (old) await supabase.storage.from(BUCKET).remove([old]);
+        const oldBucket = bucketFromPublicUrl(value);
+        const old = oldBucket ? pathFromPublicUrl(value, oldBucket) : null;
+        if (oldBucket && old) await supabase.storage.from(oldBucket).remove([old]);
       }
       onChange(data.publicUrl);
       toast.success("Image uploaded");
@@ -59,8 +63,9 @@ export function ImageUpload({
     if (!confirm("Delete this image?")) return;
     setBusy(true);
     try {
-      const old = pathFromPublicUrl(value);
-      if (old) await supabase.storage.from(BUCKET).remove([old]);
+      const oldBucket = bucketFromPublicUrl(value);
+      const old = oldBucket ? pathFromPublicUrl(value, oldBucket) : null;
+      if (oldBucket && old) await supabase.storage.from(oldBucket).remove([old]);
       onChange(null);
       toast.success("Image deleted");
     } catch (e: any) {
