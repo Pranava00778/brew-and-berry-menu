@@ -16,6 +16,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminLandingRouteImport } from './routes/admin.landing'
+import { Route as AdminFooterRouteImport } from './routes/admin.footer'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 
 const AuthRoute = AuthRouteImport.update({
@@ -53,6 +54,11 @@ const AdminLandingRoute = AdminLandingRouteImport.update({
   path: '/landing',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFooterRoute = AdminFooterRouteImport.update({
+  id: '/footer',
+  path: '/footer',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/footer': typeof AdminFooterRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/footer': typeof AdminFooterRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/footer': typeof AdminFooterRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/admin/categories'
+    | '/admin/footer'
     | '/admin/landing'
     | '/admin/products'
     | '/admin/settings'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin/categories'
+    | '/admin/footer'
     | '/admin/landing'
     | '/admin/products'
     | '/admin/settings'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/admin/categories'
+    | '/admin/footer'
     | '/admin/landing'
     | '/admin/products'
     | '/admin/settings'
@@ -178,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLandingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/footer': {
+      id: '/admin/footer'
+      path: '/footer'
+      fullPath: '/admin/footer'
+      preLoaderRoute: typeof AdminFooterRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -190,6 +209,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminFooterRoute: typeof AdminFooterRoute
   AdminLandingRoute: typeof AdminLandingRoute
   AdminProductsRoute: typeof AdminProductsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -198,6 +218,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminFooterRoute: AdminFooterRoute,
   AdminLandingRoute: AdminLandingRoute,
   AdminProductsRoute: AdminProductsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
