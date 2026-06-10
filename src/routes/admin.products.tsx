@@ -239,7 +239,7 @@ function ProductDialog({
           </div>
           <div>
             <Label>Image</Label>
-            <div className="mt-1"><ImageUpload value={form.product_image} onChange={(u) => update("product_image", u ?? "")} folder="products" aspect="video" /></div>
+            <div className="mt-1"><ImageUpload value={form.product_image} onChange={(u) => update("product_image", u ?? "")} bucket="products" aspect="video" /></div>
           </div>
           <Button onClick={save} className="w-full">Save</Button>
         </div>
