@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -308,9 +308,6 @@ function MenuPage() {
       <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
         <p className="font-display text-lg text-espresso">Brew & Berry</p>
         <p className="mt-1">Leaf it to us. 🌿</p>
-        <Link to="/admin" className="mt-4 inline-block text-xs uppercase tracking-widest hover:text-primary">
-          Staff Login
-        </Link>
       </footer>
     </div>
   );
