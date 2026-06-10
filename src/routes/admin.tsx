@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Leaf, Home, Image as ImageIcon, Layers, Coffee, Settings as SettingsIcon, LogOut, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
-import { ensureMenuImagesBucket } from "@/lib/storage.functions";
+
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
