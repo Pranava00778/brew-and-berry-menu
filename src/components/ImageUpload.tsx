@@ -35,17 +35,18 @@ export function ImageUpload({
     try {
       const ext = file.name.split(".").pop() || "jpg";
       const path = `${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+      const { error } = await supabase.storage.from(bucket).upload(path, file, {
         cacheControl: "3600",
         upsert: false,
         contentType: file.type,
       });
       if (error) throw error;
-      const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+      const { data } = supabase.storage.from(bucket).getPublicUrl(path);
       // delete previous if it was in our bucket
       if (value) {
-        const old = pathFromPublicUrl(value);
-        if (old) await supabase.storage.from(BUCKET).remove([old]);
+        const oldBucket = bucketFromPublicUrl(value);
+        const old = oldBucket ? pathFromPublicUrl(value, oldBucket) : null;
+        if (oldBucket && old) await supabase.storage.from(oldBucket).remove([old]);
       }
       onChange(data.publicUrl);
       toast.success("Image uploaded");
@@ -62,8 +63,9 @@ export function ImageUpload({
     if (!confirm("Delete this image?")) return;
     setBusy(true);
     try {
-      const old = pathFromPublicUrl(value);
-      if (old) await supabase.storage.from(BUCKET).remove([old]);
+      const oldBucket = bucketFromPublicUrl(value);
+      const old = oldBucket ? pathFromPublicUrl(value, oldBucket) : null;
+      if (oldBucket && old) await supabase.storage.from(oldBucket).remove([old]);
       onChange(null);
       toast.success("Image deleted");
     } catch (e: any) {
