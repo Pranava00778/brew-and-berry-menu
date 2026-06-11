@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      footer_links: {
+        Row: {
+          active_status: boolean
+          created_at: string
+          display_order: number
+          id: string
+          label: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          label: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          label?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       landing_settings: {
         Row: {
           cover_image: string | null
