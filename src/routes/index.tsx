@@ -38,6 +38,44 @@ type Landing = {
   overlay_opacity: number;
 };
 
+type FooterLink = { id: string; label: string; url: string };
+
+function SiteFooter() {
+  const { data: links = [] } = useQuery({
+    queryKey: ["footer_links", "public"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("footer_links")
+        .select("id,label,url")
+        .eq("active_status", true)
+        .order("display_order");
+      return (data ?? []) as FooterLink[];
+    },
+  });
+
+  return (
+    <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
+      <p className="font-display text-lg text-espresso">Brew & Berry</p>
+      <p className="mt-1">Leaf it to us. 🌿</p>
+      {links.length > 0 && (
+        <nav className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 px-4">
+          {links.map((l) => (
+            <a
+              key={l.id}
+              href={l.url}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-primary transition-colors"
+            >
+              {l.label}
+            </a>
+          ))}
+        </nav>
+      )}
+    </footer>
+  );
+}
+
 function MenuPage() {
   const navigate = useNavigate();
   const { data: landing } = useQuery({
