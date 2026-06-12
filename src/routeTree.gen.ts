@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSuperCategoriesRouteImport } from './routes/admin.super-categories'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminLandingRouteImport } from './routes/admin.landing'
@@ -37,6 +38,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSuperCategoriesRoute = AdminSuperCategoriesRouteImport.update({
+  id: '/super-categories',
+  path: '/super-categories',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/super-categories': typeof AdminSuperCategoriesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/super-categories': typeof AdminSuperCategoriesRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/super-categories': typeof AdminSuperCategoriesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/admin/products'
     | '/admin/settings'
+    | '/admin/super-categories'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/admin/products'
     | '/admin/settings'
+    | '/admin/super-categories'
     | '/admin'
   id:
     | '__root__'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/admin/landing'
     | '/admin/products'
     | '/admin/settings'
+    | '/admin/super-categories'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -167,6 +179,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/super-categories': {
+      id: '/admin/super-categories'
+      path: '/super-categories'
+      fullPath: '/admin/super-categories'
+      preLoaderRoute: typeof AdminSuperCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/settings': {
@@ -213,6 +232,7 @@ interface AdminRouteChildren {
   AdminLandingRoute: typeof AdminLandingRoute
   AdminProductsRoute: typeof AdminProductsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSuperCategoriesRoute: typeof AdminSuperCategoriesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -222,6 +242,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLandingRoute: AdminLandingRoute,
   AdminProductsRoute: AdminProductsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSuperCategoriesRoute: AdminSuperCategoriesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -235,3 +256,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
