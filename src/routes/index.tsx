@@ -250,6 +250,28 @@ function MenuPage() {
 
       {/* Sticky category nav with photos */}
       <div id="menu" className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border">
+        {superCategories.length > 0 && (
+          <div className="overflow-x-auto no-scrollbar border-b border-border/60">
+            <div className="flex items-center gap-2 px-4 py-2.5 min-w-max">
+              {superCategories.map((s) => {
+                const active = activeSup === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setActiveSup(s.id)}
+                    className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium tracking-wide transition-colors ${
+                      active
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {s.super_category_name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <div ref={pillsRef} className="overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-3 px-4 py-3 min-w-max">
             {categories.map((c) => {
