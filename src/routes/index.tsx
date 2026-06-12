@@ -15,6 +15,13 @@ type Category = {
   category_image: string | null;
   display_order: number;
   active_status: boolean;
+  super_category_id: string | null;
+};
+
+type SuperCategory = {
+  id: string;
+  super_category_name: string;
+  display_order: number;
 };
 
 type Product = {
@@ -86,7 +93,19 @@ function MenuPage() {
     },
   });
 
-  const { data: categories = [] } = useQuery({
+  const { data: superCategories = [] } = useQuery({
+    queryKey: ["super_categories", "public"],
+    queryFn: async (): Promise<SuperCategory[]> => {
+      const { data } = await supabase
+        .from("super_categories")
+        .select("id,super_category_name,display_order")
+        .eq("active_status", true)
+        .order("display_order", { ascending: true });
+      return (data ?? []) as SuperCategory[];
+    },
+  });
+
+  const { data: allCategories = [] } = useQuery({
     queryKey: ["categories", "public"],
     queryFn: async (): Promise<Category[]> => {
       const { data } = await supabase
@@ -119,13 +138,38 @@ function MenuPage() {
     return map;
   }, [products]);
 
+  const [activeSup, setActiveSup] = useState<string | null>(null);
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const pillsRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  // Default active super category
   useEffect(() => {
-    if (!activeCat && categories.length) setActiveCat(categories[0].id);
+    if (activeSup !== null) return;
+    if (superCategories.length) {
+      setActiveSup(superCategories[0].id);
+    } else if (allCategories.length) {
+      setActiveSup(""); // sentinel: no super categories configured → show all
+    }
+  }, [superCategories, allCategories, activeSup]);
+
+  // Categories visible under the active super category
+  const categories = useMemo(() => {
+    if (!activeSup) return allCategories;
+    if (activeSup === "") return allCategories;
+    return allCategories.filter((c) => c.super_category_id === activeSup);
+  }, [allCategories, activeSup]);
+
+  // Reset active category when super category changes / list changes
+  useEffect(() => {
+    if (categories.length === 0) {
+      setActiveCat(null);
+      return;
+    }
+    if (!activeCat || !categories.some((c) => c.id === activeCat)) {
+      setActiveCat(categories[0].id);
+    }
   }, [categories, activeCat]);
 
   // Observe horizontal scroll to update active category
@@ -206,6 +250,28 @@ function MenuPage() {
 
       {/* Sticky category nav with photos */}
       <div id="menu" className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border">
+        {superCategories.length > 0 && (
+          <div className="overflow-x-auto no-scrollbar border-b border-border/60">
+            <div className="flex items-center gap-2 px-4 py-2.5 min-w-max">
+              {superCategories.map((s) => {
+                const active = activeSup === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setActiveSup(s.id)}
+                    className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium tracking-wide transition-colors ${
+                      active
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {s.super_category_name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <div ref={pillsRef} className="overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-3 px-4 py-3 min-w-max">
             {categories.map((c) => {

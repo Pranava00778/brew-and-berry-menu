@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           display_order: number
           id: string
+          super_category_id: string | null
           updated_at: string
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          super_category_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -40,9 +42,18 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          super_category_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_super_category_id_fkey"
+            columns: ["super_category_id"]
+            isOneToOne: false
+            referencedRelation: "super_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       footer_links: {
         Row: {
@@ -159,6 +170,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      super_categories: {
+        Row: {
+          active_status: boolean
+          created_at: string
+          display_order: number
+          id: string
+          super_category_name: string
+          updated_at: string
+        }
+        Insert: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          super_category_name: string
+          updated_at?: string
+        }
+        Update: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          super_category_name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
