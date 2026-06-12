@@ -138,13 +138,38 @@ function MenuPage() {
     return map;
   }, [products]);
 
+  const [activeSup, setActiveSup] = useState<string | null>(null);
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const pillsRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  // Default active super category
   useEffect(() => {
-    if (!activeCat && categories.length) setActiveCat(categories[0].id);
+    if (activeSup !== null) return;
+    if (superCategories.length) {
+      setActiveSup(superCategories[0].id);
+    } else if (allCategories.length) {
+      setActiveSup(""); // sentinel: no super categories configured → show all
+    }
+  }, [superCategories, allCategories, activeSup]);
+
+  // Categories visible under the active super category
+  const categories = useMemo(() => {
+    if (!activeSup) return allCategories;
+    if (activeSup === "") return allCategories;
+    return allCategories.filter((c) => c.super_category_id === activeSup);
+  }, [allCategories, activeSup]);
+
+  // Reset active category when super category changes / list changes
+  useEffect(() => {
+    if (categories.length === 0) {
+      setActiveCat(null);
+      return;
+    }
+    if (!activeCat || !categories.some((c) => c.id === activeCat)) {
+      setActiveCat(categories[0].id);
+    }
   }, [categories, activeCat]);
 
   // Observe horizontal scroll to update active category
