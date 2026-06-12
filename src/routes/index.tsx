@@ -15,6 +15,13 @@ type Category = {
   category_image: string | null;
   display_order: number;
   active_status: boolean;
+  super_category_id: string | null;
+};
+
+type SuperCategory = {
+  id: string;
+  super_category_name: string;
+  display_order: number;
 };
 
 type Product = {
@@ -86,7 +93,19 @@ function MenuPage() {
     },
   });
 
-  const { data: categories = [] } = useQuery({
+  const { data: superCategories = [] } = useQuery({
+    queryKey: ["super_categories", "public"],
+    queryFn: async (): Promise<SuperCategory[]> => {
+      const { data } = await supabase
+        .from("super_categories")
+        .select("id,super_category_name,display_order")
+        .eq("active_status", true)
+        .order("display_order", { ascending: true });
+      return (data ?? []) as SuperCategory[];
+    },
+  });
+
+  const { data: allCategories = [] } = useQuery({
     queryKey: ["categories", "public"],
     queryFn: async (): Promise<Category[]> => {
       const { data } = await supabase
