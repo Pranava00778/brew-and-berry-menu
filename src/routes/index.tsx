@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import heroFallback from "@/assets/hero-rooftop.jpg";
 import { Leaf, Lock } from "lucide-react";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/")({
   component: MenuPage,
