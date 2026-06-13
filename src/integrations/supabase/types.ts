@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           display_order: number
           id: string
+          super_category_id: string | null
           updated_at: string
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          super_category_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -40,7 +42,94 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          super_category_id?: string | null
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_super_category_id_fkey"
+            columns: ["super_category_id"]
+            isOneToOne: false
+            referencedRelation: "super_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_pricing_rules: {
+        Row: {
+          adjustment_type: string
+          adjustment_value: number
+          created_at: string
+          description: string | null
+          ends_at: string
+          id: string
+          is_active: boolean
+          is_archived: boolean
+          name: string
+          scope: string
+          scope_id: string | null
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          adjustment_type?: string
+          adjustment_value?: number
+          created_at?: string
+          description?: string | null
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          is_archived?: boolean
+          name: string
+          scope?: string
+          scope_id?: string | null
+          starts_at?: string
+          updated_at?: string
+        }
+        Update: {
+          adjustment_type?: string
+          adjustment_value?: number
+          created_at?: string
+          description?: string | null
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          is_archived?: boolean
+          name?: string
+          scope?: string
+          scope_id?: string | null
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      footer_links: {
+        Row: {
+          active_status: boolean
+          created_at: string
+          display_order: number
+          id: string
+          label: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          label: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          label?: string
+          updated_at?: string
+          url?: string
         }
         Relationships: []
       }
@@ -51,6 +140,7 @@ export type Database = {
           cta_text: string
           id: string
           overlay_opacity: number
+          show_product_images: boolean
           subtitle: string
           title: string
           updated_at: string
@@ -61,6 +151,7 @@ export type Database = {
           cta_text?: string
           id?: string
           overlay_opacity?: number
+          show_product_images?: boolean
           subtitle?: string
           title?: string
           updated_at?: string
@@ -71,9 +162,43 @@ export type Database = {
           cta_text?: string
           id?: string
           overlay_opacity?: number
+          show_product_images?: boolean
           subtitle?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      pricing_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          new_values: Json | null
+          old_values: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -129,6 +254,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      promotions: {
+        Row: {
+          badge_text: string | null
+          banner_cta_text: string | null
+          banner_image: string | null
+          created_at: string
+          discount_type: string
+          discount_value: number
+          display_order: number
+          ends_at: string
+          id: string
+          is_active: boolean
+          is_archived: boolean
+          scope: string
+          scope_id: string | null
+          show_banner: boolean
+          starts_at: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          badge_text?: string | null
+          banner_cta_text?: string | null
+          banner_image?: string | null
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          display_order?: number
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          is_archived?: boolean
+          scope?: string
+          scope_id?: string | null
+          show_banner?: boolean
+          starts_at?: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          badge_text?: string | null
+          banner_cta_text?: string | null
+          banner_image?: string | null
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          display_order?: number
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          is_archived?: boolean
+          scope?: string
+          scope_id?: string | null
+          show_banner?: boolean
+          starts_at?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      super_categories: {
+        Row: {
+          active_status: boolean
+          created_at: string
+          display_order: number
+          id: string
+          super_category_name: string
+          updated_at: string
+        }
+        Insert: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          super_category_name: string
+          updated_at?: string
+        }
+        Update: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          super_category_name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
