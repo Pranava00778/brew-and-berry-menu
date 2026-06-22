@@ -51,6 +51,7 @@ export type Database = {
           cta_text: string
           id: string
           overlay_opacity: number
+          show_product_images: boolean
           subtitle: string
           title: string
           updated_at: string
@@ -61,6 +62,7 @@ export type Database = {
           cta_text?: string
           id?: string
           overlay_opacity?: number
+          show_product_images?: boolean
           subtitle?: string
           title?: string
           updated_at?: string
@@ -71,6 +73,7 @@ export type Database = {
           cta_text?: string
           id?: string
           overlay_opacity?: number
+          show_product_images?: boolean
           subtitle?: string
           title?: string
           updated_at?: string

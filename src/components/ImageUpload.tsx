@@ -75,6 +75,29 @@ export function ImageUpload({
     }
   };
 
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!busy) setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (busy) return;
+    const f = e.dataTransfer.files?.[0];
+    if (f && f.type.startsWith("image/")) {
+      upload(f);
+    } else if (f) {
+      toast.error("Only image files are allowed");
+    }
+  };
+
   const aspectCls = aspect === "square" ? "aspect-square" : "aspect-video";
 
   return (
@@ -89,17 +112,49 @@ export function ImageUpload({
           if (f) upload(f);
         }}
       />
-      <div className={`relative ${aspectCls} w-full overflow-hidden rounded-xl border bg-muted`}>
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => !value && !busy && inputRef.current?.click()}
+        className={`relative ${aspectCls} w-full overflow-hidden rounded-xl border transition-all duration-200 cursor-pointer ${
+          isDragging
+            ? "border-primary bg-primary/10 scale-[1.01]"
+            : value
+            ? "border-border hover:border-muted-foreground/50"
+            : "border-dashed border-muted-foreground/30 bg-muted hover:border-muted-foreground/60 hover:bg-muted/70"
+        }`}
+      >
         {value ? (
-          <img src={value} alt="" className="h-full w-full object-cover" />
+          <div className="group relative h-full w-full">
+            <img src={value} alt="" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="text-white text-xs font-medium bg-black/60 px-3 py-1.5 rounded-full flex items-center gap-1">
+                <Upload className="h-3.5 w-3.5" /> Drop to replace
+              </span>
+            </div>
+          </div>
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-            <ImageIcon className="h-8 w-8" />
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-4 text-center text-muted-foreground">
+            <div className="rounded-full bg-background p-2.5 shadow-sm border border-border">
+              <Upload className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-foreground">
+                {isDragging ? "Drop your image here" : "Drag & drop image"}
+              </p>
+              <p className="text-[10px]">
+                or <span className="text-primary hover:underline">browse files</span>
+              </p>
+            </div>
           </div>
         )}
         {busy && (
-          <div className="absolute inset-0 grid place-items-center bg-background/60">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <div className="absolute inset-0 grid place-items-center bg-background/60 backdrop-blur-[1px]">
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-[10px] font-medium text-muted-foreground">Uploading...</span>
+            </div>
           </div>
         )}
       </div>

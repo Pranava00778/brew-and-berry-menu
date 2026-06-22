@@ -36,6 +36,7 @@ type Landing = {
   subtitle: string;
   cta_text: string;
   overlay_opacity: number;
+  show_product_images: boolean;
 };
 
 function MenuPage() {
@@ -177,7 +178,7 @@ function MenuPage() {
                   key={c.id}
                   data-pill-id={c.id}
                   onClick={() => scrollToCategory(c.id)}
-                  className={`flex flex-col items-center gap-1.5 shrink-0 transition-all ${
+                  className={`flex flex-col items-center gap-1.5 shrink-0 transition-all w-20 ${
                     active ? "scale-105" : "opacity-70 hover:opacity-100"
                   }`}
                 >
@@ -195,7 +196,7 @@ function MenuPage() {
                     )}
                   </div>
                   <span
-                    className={`whitespace-nowrap text-xs font-medium max-w-[88px] truncate ${
+                    className={`whitespace-nowrap text-xs font-medium w-full text-center truncate ${
                       active ? "text-primary" : "text-muted-foreground"
                     }`}
                   >
@@ -250,19 +251,21 @@ function MenuPage() {
                         key={p.id}
                         className="group rounded-2xl bg-card border border-border overflow-hidden shadow-sm hover:shadow-lg transition-all"
                       >
-                        {p.product_image ? (
-                          <div className="aspect-[4/3] overflow-hidden bg-muted">
-                            <img
-                              src={p.product_image}
-                              alt={p.product_name}
-                              loading="lazy"
-                              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          </div>
-                        ) : (
-                          <div className="aspect-[4/3] bg-gradient-to-br from-bamboo-soft/30 to-sand flex items-center justify-center">
-                            <Leaf className="h-10 w-10 text-bamboo-soft/60" />
-                          </div>
+                        {landing?.show_product_images !== false && (
+                          p.product_image ? (
+                            <div className="aspect-[4/3] overflow-hidden bg-muted">
+                              <img
+                                src={p.product_image}
+                                alt={p.product_name}
+                                loading="lazy"
+                                className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                            </div>
+                          ) : (
+                            <div className="aspect-[4/3] bg-gradient-to-br from-bamboo-soft/30 to-sand flex items-center justify-center">
+                              <Leaf className="h-10 w-10 text-bamboo-soft/60" />
+                            </div>
+                          )
                         )}
                         <div className="p-5">
                           <div className="flex items-start justify-between gap-3">
@@ -307,5 +310,50 @@ function MenuPage() {
 
       <SiteFooter />
     </div>
+  );
+}
+
+function SiteFooter() {
+  const { data: links = [] } = useQuery({
+    queryKey: ["footer_links", "public"],
+    queryFn: async (): Promise<{ label: string; url: string }[]> => {
+      const { data } = await supabase
+        .from("footer_links")
+        .select("label, url")
+        .eq("active_status", true)
+        .order("display_order", { ascending: true });
+      return (data ?? []) as { label: string; url: string }[];
+    },
+  });
+
+  return (
+    <footer className="bg-espresso text-cream/80 py-12 px-6 border-t border-cream/10">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-2 text-cream">
+          <Leaf className="h-5 w-5 text-primary" />
+          <span className="font-display text-base tracking-[0.2em] uppercase">Brew & Berry</span>
+        </div>
+        
+        {links.length > 0 && (
+          <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4">
+            {links.map((link, idx) => (
+              <a
+                key={idx}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm hover:text-cream transition-colors duration-200"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        )}
+        
+        <p className="text-xs text-cream/40">
+          &copy; {new Date().getFullYear()} Brew & Berry. All rights reserved.
+        </p>
+      </div>
+    </footer>
   );
 }

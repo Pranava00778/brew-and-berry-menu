@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export const Route = createFileRoute("/admin/landing")({
   component: LandingAdmin,
@@ -57,13 +58,15 @@ function LandingAdmin() {
           <Input value={row.cta_text} onChange={(e) => update({ cta_text: e.target.value })} />
         </div>
         <div>
-          <Label>Cover image URL</Label>
-          <Input value={row.cover_image ?? ""} placeholder="https://…" onChange={(e) => update({ cover_image: e.target.value })} />
-          {row.cover_image && (
-            <div className="mt-3 aspect-video overflow-hidden rounded-xl bg-muted">
-              <img src={row.cover_image} alt="" className="h-full w-full object-cover" />
-            </div>
-          )}
+          <Label>Cover image</Label>
+          <div className="mt-1">
+            <ImageUpload
+              value={row.cover_image}
+              onChange={(url) => update({ cover_image: url })}
+              bucket="products"
+              aspect="video"
+            />
+          </div>
         </div>
         <div>
           <Label>Hero overlay opacity ({row.overlay_opacity})</Label>

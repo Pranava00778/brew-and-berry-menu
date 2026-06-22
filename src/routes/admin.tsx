@@ -130,7 +130,7 @@ function AdminLayout() {
         </nav>
       </div>
 
-      <main className="md:pl-64 p-4 md:p-8 md:pl-12 max-w-6xl">
+      <main className="md:pl-[288px] p-4 md:p-8 max-w-6xl">
         <Outlet />
       </main>
     </div>

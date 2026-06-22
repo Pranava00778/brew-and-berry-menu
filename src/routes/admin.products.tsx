@@ -47,6 +47,29 @@ function ProductsAdmin() {
     },
   });
 
+  const { data: landing } = useQuery({
+    queryKey: ["admin", "landing_settings"],
+    queryFn: async () => {
+      const { data } = await supabase.from("landing_settings").select("*").limit(1).maybeSingle();
+      return data;
+    },
+  });
+
+  const toggleShowProductImages = async (checked: boolean) => {
+    if (!landing) return;
+    const { error } = await supabase
+      .from("landing_settings")
+      .update({ show_product_images: checked })
+      .eq("id", landing.id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Settings updated");
+      qc.invalidateQueries({ queryKey: ["admin", "landing_settings"] });
+      qc.invalidateQueries({ queryKey: ["landing"] });
+    }
+  };
+
   const effectiveCat = filterCat || cats[0]?.id;
 
   const { data: products = [] } = useQuery({
@@ -90,6 +113,19 @@ function ProductsAdmin() {
         <ProductDialog cats={cats} defaultCategoryId={effectiveCat} onSaved={() => qc.invalidateQueries({ queryKey: ["admin", "products"] })}>
           <Button><Plus className="h-4 w-4 mr-1" /> New product</Button>
         </ProductDialog>
+      </div>
+
+      <div className="mt-6 flex items-center justify-between rounded-xl border bg-card p-4 max-w-xl">
+        <div className="space-y-0.5">
+          <Label className="text-base font-semibold">Show Product Images</Label>
+          <p className="text-sm text-muted-foreground">
+            Toggle to show or hide images for products on the menu page.
+          </p>
+        </div>
+        <Switch
+          checked={landing?.show_product_images ?? true}
+          onCheckedChange={toggleShowProductImages}
+        />
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
