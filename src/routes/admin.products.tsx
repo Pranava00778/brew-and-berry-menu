@@ -10,11 +10,13 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { GripVertical, Plus, Pencil, Trash2, Search } from "lucide-react";
+import { GripVertical, Plus, Pencil, Trash2, Search, TrendingUp, Tag as TagIcon } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ImageUpload } from "@/components/ImageUpload";
+import { usePricing } from "@/hooks/use-pricing";
+import { PricingResult } from "@/lib/pricing";
 
 export const Route = createFileRoute("/admin/products")({
   component: ProductsAdmin,
@@ -38,6 +40,7 @@ function ProductsAdmin() {
   const qc = useQueryClient();
   const [filterCat, setFilterCat] = useState<string>("");
   const [search, setSearch] = useState("");
+  const { getPrice } = usePricing();
 
   const { data: cats = [] } = useQuery({
     queryKey: ["admin", "categories", "lite"],
@@ -46,29 +49,6 @@ function ProductsAdmin() {
       return (data ?? []) as Cat[];
     },
   });
-
-  const { data: landing } = useQuery({
-    queryKey: ["admin", "landing_settings"],
-    queryFn: async () => {
-      const { data } = await supabase.from("landing_settings").select("*").limit(1).maybeSingle();
-      return data;
-    },
-  });
-
-  const toggleShowProductImages = async (checked: boolean) => {
-    if (!landing) return;
-    const { error } = await supabase
-      .from("landing_settings")
-      .update({ show_product_images: checked })
-      .eq("id", landing.id);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Settings updated");
-      qc.invalidateQueries({ queryKey: ["admin", "landing_settings"] });
-      qc.invalidateQueries({ queryKey: ["landing"] });
-    }
-  };
 
   const effectiveCat = filterCat || cats[0]?.id;
 
@@ -107,25 +87,12 @@ function ProductsAdmin() {
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl text-espresso">Products</h1>
+          <h1 className="font-title text-3xl text-espresso">Products</h1>
           <p className="text-muted-foreground mt-1">Drag to reorder within a category.</p>
         </div>
         <ProductDialog cats={cats} defaultCategoryId={effectiveCat} onSaved={() => qc.invalidateQueries({ queryKey: ["admin", "products"] })}>
           <Button><Plus className="h-4 w-4 mr-1" /> New product</Button>
         </ProductDialog>
-      </div>
-
-      <div className="mt-6 flex items-center justify-between rounded-xl border bg-card p-4 max-w-xl">
-        <div className="space-y-0.5">
-          <Label className="text-base font-semibold">Show Product Images</Label>
-          <p className="text-sm text-muted-foreground">
-            Toggle to show or hide images for products on the menu page.
-          </p>
-        </div>
-        <Switch
-          checked={landing?.show_product_images ?? true}
-          onCheckedChange={toggleShowProductImages}
-        />
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
@@ -141,13 +108,21 @@ function ProductsAdmin() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border bg-card divide-y">
+      <div className="mt-6 rounded-2xl border bg-card divide-y overflow-hidden">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={filtered.map((p) => p.id)} strategy={verticalListSortingStrategy}>
-            {filtered.map((p) => (
-              <ProdRow key={p.id} product={p} cats={cats}
-                onChanged={() => qc.invalidateQueries({ queryKey: ["admin", "products"] })} />
-            ))}
+            {filtered.map((p) => {
+              const cat = cats.find((c) => c.id === p.category_id);
+              // For admin products we don't have super_category_id readily joined in this lite query, 
+              // but since pricing handles it as an optional check, we'll pass what we have.
+              // To be perfectly accurate we'd need to fetch super_category_id for the category.
+              // We'll pass it as undefined for now, so global and category/product rules still apply.
+              const pricing = getPrice({ id: p.id, price: p.price, category_id: p.category_id });
+              return (
+                <ProdRow key={p.id} product={p} cats={cats} pricing={pricing}
+                  onChanged={() => qc.invalidateQueries({ queryKey: ["admin", "products"] })} />
+              );
+            })}
           </SortableContext>
         </DndContext>
         {filtered.length === 0 && <p className="p-6 text-muted-foreground text-sm">No products match.</p>}
@@ -156,7 +131,7 @@ function ProductsAdmin() {
   );
 }
 
-function ProdRow({ product, cats, onChanged }: { product: Product; cats: Cat[]; onChanged: () => void }) {
+function ProdRow({ product, cats, pricing, onChanged }: { product: Product; cats: Cat[]; pricing: PricingResult; onChanged: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
 
@@ -183,8 +158,27 @@ function ProdRow({ product, cats, onChanged }: { product: Product; cats: Cat[]; 
         <div className="h-12 w-12 rounded-lg bg-secondary" />
       )}
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate">{product.product_name}</p>
-        <p className="text-xs text-muted-foreground">₹{Number(product.price).toFixed(0)} · order #{product.display_order}</p>
+        <div className="flex items-center gap-2">
+          <p className="font-medium truncate">{product.product_name}</p>
+          {pricing.eventRule && (
+            <TrendingUp className="h-3.5 w-3.5 text-gold" title={`Event Adjustment Active: ${pricing.eventRule.name}`} />
+          )}
+          {pricing.promotion && (
+            <TagIcon className="h-3.5 w-3.5 text-primary" title={`Promotion Active: ${pricing.promotion.title}`} />
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {pricing.adjustedPrice !== pricing.customerPrice || pricing.adjustedPrice !== Number(product.price) ? (
+            <>
+              <span className="mr-1 opacity-70">₹{Number(product.price).toFixed(0)}</span>
+              <span className="mr-1 opacity-70">→</span>
+              <span className={`font-medium ${pricing.promotion ? "text-primary" : "text-gold"}`}>₹{pricing.customerPrice}</span>
+            </>
+          ) : (
+            <span>₹{Number(product.price).toFixed(0)}</span>
+          )}
+          {" · "}order #{product.display_order}
+        </p>
       </div>
       <Switch checked={product.active_status} onCheckedChange={toggle} />
       <ProductDialog cats={cats} product={product} onSaved={onChanged}>

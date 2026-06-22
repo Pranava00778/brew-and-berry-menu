@@ -70,7 +70,7 @@ function FooterAdmin() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-espresso">Footer Links</h1>
+          <h1 className="font-title text-3xl text-espresso">Footer Links</h1>
           <p className="text-muted-foreground mt-1">Manage links shown in the public menu footer.</p>
         </div>
         <LinkDialog onSaved={refresh} nextOrder={(links.at(-1)?.display_order ?? 0) + 1}>

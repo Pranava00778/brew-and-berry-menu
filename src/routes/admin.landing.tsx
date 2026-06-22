@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/ImageUpload";
 
@@ -33,6 +34,7 @@ function LandingAdmin() {
       cta_text: row.cta_text,
       cover_image: row.cover_image,
       overlay_opacity: row.overlay_opacity,
+      show_product_images: row.show_product_images,
     }).eq("id", row.id);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -41,7 +43,7 @@ function LandingAdmin() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="font-display text-3xl text-espresso">Landing content</h1>
+      <h1 className="font-title text-3xl text-espresso">Landing content</h1>
       <p className="text-muted-foreground mt-1">Changes appear instantly on the menu.</p>
 
       <div className="mt-8 space-y-5">
@@ -72,6 +74,17 @@ function LandingAdmin() {
           <Label>Hero overlay opacity ({row.overlay_opacity})</Label>
           <Slider value={[row.overlay_opacity]} min={0} max={1} step={0.05}
             onValueChange={(v) => update({ overlay_opacity: v[0] })} />
+        </div>
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div>
+            <Label htmlFor="show-product-images" className="text-sm font-medium">Show product images on menu</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">When off, product cards will display without photos</p>
+          </div>
+          <Switch
+            id="show-product-images"
+            checked={row.show_product_images ?? true}
+            onCheckedChange={(v) => update({ show_product_images: v })}
+          />
         </div>
         <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save changes"}</Button>
       </div>

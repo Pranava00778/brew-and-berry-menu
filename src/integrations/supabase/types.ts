@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           display_order: number
           id: string
+          super_category_id: string | null
           updated_at: string
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          super_category_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -40,6 +42,42 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          super_category_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_super_category_id_fkey"
+            columns: ["super_category_id"]
+            isOneToOne: false
+            referencedRelation: "super_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      super_categories: {
+        Row: {
+          active_status: boolean
+          created_at: string
+          display_order: number
+          id: string
+          super_category_name: string
+          updated_at: string
+        }
+        Insert: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          super_category_name: string
+          updated_at?: string
+        }
+        Update: {
+          active_status?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          super_category_name?: string
           updated_at?: string
         }
         Relationships: []
@@ -55,6 +93,7 @@ export type Database = {
           subtitle: string
           title: string
           updated_at: string
+          promo_text: string | null
         }
         Insert: {
           cover_image?: string | null
@@ -66,6 +105,7 @@ export type Database = {
           subtitle?: string
           title?: string
           updated_at?: string
+          promo_text?: string | null
         }
         Update: {
           cover_image?: string | null
@@ -77,6 +117,151 @@ export type Database = {
           subtitle?: string
           title?: string
           updated_at?: string
+          promo_text?: string | null
+        }
+        Relationships: []
+      }
+      event_pricing_rules: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          adjustment_type: string
+          adjustment_value: number
+          scope: string
+          scope_id: string | null
+          starts_at: string
+          ends_at: string
+          is_active: boolean
+          is_archived: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          adjustment_type?: string
+          adjustment_value?: number
+          scope?: string
+          scope_id?: string | null
+          starts_at?: string
+          ends_at?: string
+          is_active?: boolean
+          is_archived?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          adjustment_type?: string
+          adjustment_value?: number
+          scope?: string
+          scope_id?: string | null
+          starts_at?: string
+          ends_at?: string
+          is_active?: boolean
+          is_archived?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      promotions: {
+        Row: {
+          id: string
+          title: string
+          subtitle: string | null
+          banner_image: string | null
+          badge_text: string | null
+          discount_type: string
+          discount_value: number
+          scope: string
+          scope_id: string | null
+          starts_at: string
+          ends_at: string
+          is_active: boolean
+          is_archived: boolean
+          show_banner: boolean
+          banner_cta_text: string | null
+          display_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          subtitle?: string | null
+          banner_image?: string | null
+          badge_text?: string | null
+          discount_type?: string
+          discount_value?: number
+          scope?: string
+          scope_id?: string | null
+          starts_at?: string
+          ends_at?: string
+          is_active?: boolean
+          is_archived?: boolean
+          show_banner?: boolean
+          banner_cta_text?: string | null
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          subtitle?: string | null
+          banner_image?: string | null
+          badge_text?: string | null
+          discount_type?: string
+          discount_value?: number
+          scope?: string
+          scope_id?: string | null
+          starts_at?: string
+          ends_at?: string
+          is_active?: boolean
+          is_archived?: boolean
+          show_banner?: boolean
+          banner_cta_text?: string | null
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pricing_audit_log: {
+        Row: {
+          id: string
+          user_id: string | null
+          action: string
+          entity_type: string
+          entity_id: string
+          old_values: Record<string, unknown> | null
+          new_values: Record<string, unknown> | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          action: string
+          entity_type: string
+          entity_id: string
+          old_values?: Record<string, unknown> | null
+          new_values?: Record<string, unknown> | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          action?: string
+          entity_type?: string
+          entity_id?: string
+          old_values?: Record<string, unknown> | null
+          new_values?: Record<string, unknown> | null
+          created_at?: string
         }
         Relationships: []
       }

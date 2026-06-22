@@ -4,9 +4,83 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─── Custom Fonts ─────────────────────────────────────── */
+
+/* Heyam – Titles (h1, hero, page titles) */
+@font-face {
+  font-family: "Heyam";
+  src: url("/fonts/Heyam.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Happy School – Headings (h2, h3, section headings) */
+@font-face {
+  font-family: "Happy School";
+  src: url("/fonts/Happy School.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Opificio – Body text (all weights) */
+@font-face {
+  font-family: "Opificio";
+  src: url("/fonts/Opificio_light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Opificio";
+  src: url("/fonts/Opificio_regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Opificio";
+  src: url("/fonts/Opificio_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Opificio Rounded variants */
+@font-face {
+  font-family: "Opificio Rounded";
+  src: url("/fonts/Opificio_light_rounded.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Opificio Rounded";
+  src: url("/fonts/Opificio_rounded.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Opificio Rounded";
+  src: url("/fonts/Opificio_Bold_rounded.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Theme Tokens ─────────────────────────────────────── */
+
 @theme inline {
-  --font-display: "Playfair Display", ui-serif, Georgia, serif;
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-title: "Heyam", ui-serif, serif;
+  --font-heading: "Happy School", cursive, sans-serif;
+  --font-display: "Happy School", cursive, sans-serif;
+  --font-sans: "Opificio", ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -47,52 +121,56 @@
 :root {
   --radius: 0.875rem;
 
-  /* Botanical palette */
-  --cream: oklch(0.985 0.012 95);
-  --sand: oklch(0.94 0.025 80);
-  --bamboo: oklch(0.42 0.07 145);
-  --bamboo-soft: oklch(0.62 0.08 145);
-  --berry: oklch(0.45 0.13 350);
-  --espresso: oklch(0.28 0.035 60);
-  --gold: oklch(0.74 0.1 80);
+  /* Brand palette – derived from Brew & Berry brand guidelines PDF */
+  --cream: #FFF9F0;          /* Warm light cream for backdrop base */
+  --sand: #D8C5B6;           /* Cream Canvas from PDF */
+  --bamboo: #676E40;         /* Sage Harvest from PDF */
+  --bamboo-soft: #848D57;    /* Lighter Sage Harvest tint */
+  --berry: #7A416C;          /* Berry Bloom from PDF */
+  --espresso: #120D31;       /* Midnight Roast from PDF */
+  --gold: #735531;           /* Roasted Bean from PDF */
 
-  --background: oklch(0.985 0.012 95);
-  --foreground: oklch(0.28 0.035 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.28 0.035 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.28 0.035 60);
-  --primary: oklch(0.42 0.07 145);
-  --primary-foreground: oklch(0.985 0.012 95);
-  --secondary: oklch(0.94 0.025 80);
-  --secondary-foreground: oklch(0.28 0.035 60);
-  --muted: oklch(0.95 0.015 90);
-  --muted-foreground: oklch(0.5 0.02 70);
-  --accent: oklch(0.45 0.13 350);
-  --accent-foreground: oklch(0.985 0.012 95);
+  --background: #FFF9F0;     /* Cream backdrop */
+  --foreground: #120D31;     /* Midnight Roast text */
+  --card: #FFFFFF;
+  --card-foreground: #120D31;
+  --popover: #FFFFFF;
+  --popover-foreground: #120D31;
+  --primary: #120D31;
+  --primary-foreground: #FFF9F0;
+  --secondary: #D8C5B6;
+  --secondary-foreground: #120D31;
+  --muted: #EDE5D6;
+  --muted-foreground: #676E40; /* Sage Harvest */
+  --accent: #7A416C;         /* Berry Bloom */
+  --accent-foreground: #FFF9F0;
   --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(0.985 0.012 95);
-  --border: oklch(0.9 0.02 90);
-  --input: oklch(0.92 0.02 90);
-  --ring: oklch(0.42 0.07 145);
+  --destructive-foreground: #FFF9F0;
+  --border: #D8C5B6;
+  --input: #D8C5B6;
+  --ring: #120D31;
 }
 
 .dark {
-  --background: oklch(0.22 0.02 60);
-  --foreground: oklch(0.95 0.015 90);
-  --card: oklch(0.26 0.025 60);
-  --card-foreground: oklch(0.95 0.015 90);
-  --primary: oklch(0.62 0.08 145);
-  --primary-foreground: oklch(0.22 0.02 60);
-  --border: oklch(0.32 0.02 60);
-  --input: oklch(0.32 0.02 60);
-  --ring: oklch(0.62 0.08 145);
+  --background: #0C0922;     /* Darker Midnight Roast variant */
+  --foreground: #FFF9F0;     /* Cream Canvas text */
+  --card: #120D31;           /* Midnight Roast card background */
+  --card-foreground: #FFF9F0;
+  --primary: #676E40;        /* Sage Harvest primary */
+  --primary-foreground: #0C0922;
+  --border: #231E44;
+  --input: #231E44;
+  --ring: #676E40;
 }
 
 @layer base {
   * { border-color: var(--color-border); }
   html, body { background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); }
-  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+  h1 { font-family: var(--font-title); }
+  h2, h3, .font-display { font-family: var(--font-heading); letter-spacing: 0.01em; }
+
+  .font-title { font-family: var(--font-title); }
+  .font-heading { font-family: var(--font-heading); }
 
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

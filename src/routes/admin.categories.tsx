@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { GripVertical, Plus, Pencil, Trash2 } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
@@ -18,7 +19,14 @@ export const Route = createFileRoute("/admin/categories")({
   component: CategoriesAdmin,
 });
 
-type Cat = { id: string; category_name: string; category_image: string | null; display_order: number; active_status: boolean };
+type Cat = {
+  id: string;
+  category_name: string;
+  category_image: string | null;
+  super_category_id: string | null;
+  display_order: number;
+  active_status: boolean;
+};
 
 function CategoriesAdmin() {
   const qc = useQueryClient();
@@ -51,7 +59,7 @@ function CategoriesAdmin() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-3xl text-espresso">Categories</h1>
+          <h1 className="font-title text-3xl text-espresso">Categories</h1>
           <p className="text-muted-foreground mt-1">Drag to reorder. Toggle to hide.</p>
         </div>
         <CategoryDialog onSaved={() => qc.invalidateQueries({ queryKey: ["admin", "categories"] })}>
@@ -59,7 +67,7 @@ function CategoriesAdmin() {
         </CategoryDialog>
       </div>
 
-      <div className="mt-6 rounded-2xl border bg-card divide-y">
+      <div className="mt-6 rounded-2xl border bg-card divide-y overflow-hidden">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={cats.map((c) => c.id)} strategy={verticalListSortingStrategy}>
             {cats.map((c) => <Row key={c.id} cat={c} onChanged={() => qc.invalidateQueries({ queryKey: ["admin", "categories"] })} />)}
@@ -114,16 +122,31 @@ function CategoryDialog({ children, cat, onSaved }: { children: React.ReactNode;
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(cat?.category_name ?? "");
   const [image, setImage] = useState(cat?.category_image ?? "");
+  const [superCategoryId, setSuperCategoryId] = useState(cat?.super_category_id ?? "none");
+
+  const { data: superCats = [] } = useQuery({
+    queryKey: ["admin", "super_categories", "lite"],
+    queryFn: async () => {
+      const { data } = await supabase.from("super_categories").select("id, super_category_name").order("display_order");
+      return data ?? [];
+    },
+  });
 
   const save = async () => {
     if (!name.trim()) return toast.error("Name required");
+    const superCatVal = superCategoryId === "none" ? null : superCategoryId;
+    const payload = {
+      category_name: name,
+      category_image: image || null,
+      super_category_id: superCatVal,
+    };
     if (cat) {
-      const { error } = await supabase.from("categories").update({ category_name: name, category_image: image || null }).eq("id", cat.id);
+      const { error } = await supabase.from("categories").update(payload).eq("id", cat.id);
       if (error) return toast.error(error.message);
     } else {
       const { data: max } = await supabase.from("categories").select("display_order").order("display_order", { ascending: false }).limit(1).maybeSingle();
       const next = (max?.display_order ?? 0) + 1;
-      const { error } = await supabase.from("categories").insert({ category_name: name, category_image: image || null, display_order: next });
+      const { error } = await supabase.from("categories").insert({ ...payload, display_order: next });
       if (error) return toast.error(error.message);
     }
     toast.success("Saved");
@@ -132,12 +155,37 @@ function CategoryDialog({ children, cat, onSaved }: { children: React.ReactNode;
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (o && cat) { setName(cat.category_name); setImage(cat.category_image ?? ""); } else if (o) { setName(""); setImage(""); } }}>
+    <Dialog open={open} onOpenChange={(o) => {
+      setOpen(o);
+      if (o && cat) {
+        setName(cat.category_name);
+        setImage(cat.category_image ?? "");
+        setSuperCategoryId(cat.super_category_id ?? "none");
+      } else if (o) {
+        setName("");
+        setImage("");
+        setSuperCategoryId("none");
+      }
+    }}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>{cat ? "Edit category" : "New category"}</DialogTitle></DialogHeader>
         <div className="space-y-4">
           <div><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
+          <div>
+            <Label>Super Category</Label>
+            <Select value={superCategoryId} onValueChange={setSuperCategoryId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Super Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None (Unassigned)</SelectItem>
+                {superCats.map((sc) => (
+                  <SelectItem key={sc.id} value={sc.id}>{sc.super_category_name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div>
             <Label>Image</Label>
             <div className="mt-1"><ImageUpload value={image} onChange={(u) => setImage(u ?? "")} bucket="categories" aspect="video" /></div>

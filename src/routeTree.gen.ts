@@ -13,10 +13,13 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSuperCategoriesRouteImport } from './routes/admin.super-categories'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminLandingRouteImport } from './routes/admin.landing'
 import { Route as AdminFooterRouteImport } from './routes/admin.footer'
+import { Route as AdminEventPricingRouteImport } from './routes/admin.event-pricing'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 
 const AuthRoute = AuthRouteImport.update({
@@ -39,9 +42,19 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSuperCategoriesRoute = AdminSuperCategoriesRouteImport.update({
+  id: '/super-categories',
+  path: '/super-categories',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPromotionsRoute = AdminPromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminProductsRoute = AdminProductsRouteImport.update({
@@ -59,6 +72,11 @@ const AdminFooterRoute = AdminFooterRouteImport.update({
   path: '/footer',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEventPricingRoute = AdminEventPricingRouteImport.update({
+  id: '/event-pricing',
+  path: '/event-pricing',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -70,20 +88,26 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/event-pricing': typeof AdminEventPricingRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/super-categories': typeof AdminSuperCategoriesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/event-pricing': typeof AdminEventPricingRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/super-categories': typeof AdminSuperCategoriesRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -92,10 +116,13 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/event-pricing': typeof AdminEventPricingRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/super-categories': typeof AdminSuperCategoriesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -105,20 +132,26 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/admin/categories'
+    | '/admin/event-pricing'
     | '/admin/footer'
     | '/admin/landing'
     | '/admin/products'
+    | '/admin/promotions'
     | '/admin/settings'
+    | '/admin/super-categories'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/admin/categories'
+    | '/admin/event-pricing'
     | '/admin/footer'
     | '/admin/landing'
     | '/admin/products'
+    | '/admin/promotions'
     | '/admin/settings'
+    | '/admin/super-categories'
     | '/admin'
   id:
     | '__root__'
@@ -126,10 +159,13 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/admin/categories'
+    | '/admin/event-pricing'
     | '/admin/footer'
     | '/admin/landing'
     | '/admin/products'
+    | '/admin/promotions'
     | '/admin/settings'
+    | '/admin/super-categories'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -169,11 +205,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/super-categories': {
+      id: '/admin/super-categories'
+      path: '/super-categories'
+      fullPath: '/admin/super-categories'
+      preLoaderRoute: typeof AdminSuperCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/promotions': {
+      id: '/admin/promotions'
+      path: '/promotions'
+      fullPath: '/admin/promotions'
+      preLoaderRoute: typeof AdminPromotionsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/products': {
@@ -197,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFooterRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/event-pricing': {
+      id: '/admin/event-pricing'
+      path: '/event-pricing'
+      fullPath: '/admin/event-pricing'
+      preLoaderRoute: typeof AdminEventPricingRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -209,19 +266,25 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminEventPricingRoute: typeof AdminEventPricingRoute
   AdminFooterRoute: typeof AdminFooterRoute
   AdminLandingRoute: typeof AdminLandingRoute
   AdminProductsRoute: typeof AdminProductsRoute
+  AdminPromotionsRoute: typeof AdminPromotionsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSuperCategoriesRoute: typeof AdminSuperCategoriesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminEventPricingRoute: AdminEventPricingRoute,
   AdminFooterRoute: AdminFooterRoute,
   AdminLandingRoute: AdminLandingRoute,
   AdminProductsRoute: AdminProductsRoute,
+  AdminPromotionsRoute: AdminPromotionsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSuperCategoriesRoute: AdminSuperCategoriesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

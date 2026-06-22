@@ -87,7 +87,7 @@ function AuthPage() {
           <Leaf className="h-5 w-5" />
           <span className="text-xs tracking-[0.3em] uppercase">Brew & Berry</span>
         </div>
-        <h1 className="font-display text-3xl text-espresso">
+        <h1 className="font-title text-3xl text-espresso">
           {mode === "login"
             ? "Admin sign in"
             : mode === "signup"

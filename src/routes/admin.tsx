@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Leaf, Home, Image as ImageIcon, Layers, Coffee, Settings as SettingsIcon, LogOut, LayoutDashboard, Link2 } from "lucide-react";
+import { Leaf, Home, Image as ImageIcon, Layers, Coffee, Settings as SettingsIcon, LogOut, LayoutDashboard, Link2, FolderOpen, TrendingUp, Tag } from "lucide-react";
 import { toast } from "sonner";
 
 
@@ -14,8 +14,11 @@ export const Route = createFileRoute("/admin")({
 const NAV = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/landing", label: "Landing", icon: ImageIcon },
+  { to: "/admin/super-categories", label: "Super Categories", icon: FolderOpen },
   { to: "/admin/categories", label: "Categories", icon: Layers },
   { to: "/admin/products", label: "Products", icon: Coffee },
+  { to: "/admin/event-pricing", label: "Event Pricing", icon: TrendingUp },
+  { to: "/admin/promotions", label: "Promotions", icon: Tag },
   { to: "/admin/footer", label: "Footer Links", icon: Link2 },
   { to: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ];
@@ -35,7 +38,7 @@ function AdminLayout() {
       <div className="min-h-screen grid place-items-center px-4">
         <div className="text-center max-w-sm">
           <Leaf className="mx-auto h-8 w-8 text-primary" />
-          <h1 className="font-display text-2xl mt-3">Sign in required</h1>
+          <h1 className="font-title text-2xl mt-3">Sign in required</h1>
           <p className="text-muted-foreground text-sm mt-2">Please sign in to access the admin dashboard.</p>
           <Button className="mt-5" onClick={() => navigate({ to: "/auth" })}>Go to sign in</Button>
         </div>
@@ -48,7 +51,7 @@ function AdminLayout() {
       <div className="min-h-screen grid place-items-center px-4">
         <div className="text-center max-w-md rounded-2xl bg-card border p-8">
           <Leaf className="mx-auto h-8 w-8 text-primary" />
-          <h1 className="font-display text-2xl mt-3">Not authorized</h1>
+          <h1 className="font-title text-2xl mt-3">Not authorized</h1>
           <p className="text-muted-foreground text-sm mt-2">
             Your account ({user.email}) doesn't have the <code className="rounded bg-muted px-1">super_admin</code> role.
           </p>
@@ -77,7 +80,7 @@ function AdminLayout() {
       <aside className="fixed inset-y-0 left-0 hidden md:flex w-64 flex-col border-r border-border bg-card px-4 py-6">
         <Link to="/" className="flex items-center gap-2 text-primary mb-8 px-2">
           <Leaf className="h-5 w-5" />
-          <span className="font-display text-lg">Brew & Berry</span>
+          <span className="font-title text-lg">Brew & Berry</span>
         </Link>
         <nav className="flex-1 space-y-1">
           {NAV.map((n) => {
@@ -110,7 +113,7 @@ function AdminLayout() {
       <header className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b bg-card px-4 py-3">
         <Link to="/" className="flex items-center gap-2 text-primary">
           <Leaf className="h-4 w-4" />
-          <span className="font-display">Brew & Berry</span>
+          <span className="font-title">Brew & Berry</span>
         </Link>
         <Button size="sm" variant="ghost" onClick={signOut}><LogOut className="h-4 w-4" /></Button>
       </header>

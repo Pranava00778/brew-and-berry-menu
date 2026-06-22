@@ -9,7 +9,7 @@ function Settings() {
   const { user } = useAuth();
   return (
     <div className="max-w-2xl">
-      <h1 className="font-display text-3xl text-espresso">Settings</h1>
+      <h1 className="font-title text-3xl text-espresso">Settings</h1>
       <p className="text-muted-foreground mt-1">Account & system info.</p>
 
       <div className="mt-6 rounded-2xl border bg-card p-6 space-y-2 text-sm">
